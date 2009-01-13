@@ -18,6 +18,9 @@ module DeepTest
     #
     def before_starting_workers
     end
+    
+    def before_remote_load_files
+    end
 
     #
     # A separate listener instance is created in each worker process and

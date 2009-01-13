@@ -25,7 +25,7 @@ module DeepTest
 
       def load_files(files)
 # # puts "LOAD FILES: #{files.inspect}"
-        
+        @options.new_listener_list.before_remote_load_files
 # # $: << "#{@base_path}/lib"
 # # puts "RWS LOAD FILES workers: #{@workers.instance_variable_get("@options").new_listener_list.before_remote_load_files.inspect}"
         Dir.chdir @base_path
