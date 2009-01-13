@@ -56,5 +56,15 @@ module DeepTest
         s
       end
     end
+
+    module Array
+      def self.to_string(a)
+        a.join(File::PATH_SEPARATOR)
+      end
+
+      def self.from_string(a)
+        a.split(File::PATH_SEPARATOR)
+      end
+    end
   end
 end

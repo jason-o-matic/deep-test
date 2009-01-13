@@ -1,3 +1,4 @@
+require 'pp'
 module DeepTest
   module Distributed
     class RemoteWorkerServer
@@ -5,9 +6,14 @@ module DeepTest
 
       MERCY_KILLING_GRACE_PERIOD = 10 * 60 unless defined?(MERCY_KILLING_GRACE_PERIOD)
 
-      def initialize(base_path, workers)
+      def initialize(base_path, workers, options)
         @base_path = base_path
         @workers = workers
+        @options = options
+        
+        @resolver = FilenameResolver.new(@base_path)
+        @options.libs.each { |l| $: << @resolver.resolve(l) }
+        @options.requires.each { |r| require r }
       end
 
       def launch_mercy_killer(grace_period)
@@ -18,11 +24,34 @@ module DeepTest
       end
 
       def load_files(files)
+# # puts "LOAD FILES: #{files.inspect}"
+        
+# # $: << "#{@base_path}/lib"
+# # puts "RWS LOAD FILES workers: #{@workers.instance_variable_get("@options").new_listener_list.before_remote_load_files.inspect}"
         Dir.chdir @base_path
         resolver = FilenameResolver.new(@base_path)
+# # # # require File.expand_path("#{@base_path}/config/environment")
+# $: << "#{@base_path}/vendor/rails/activerecord/lib"
+# # # # require File.expand_path("#{@base_path}/vendor/rails/activerecord/lib/active_record")
+# require "active_record"
+# # # # require 'vendor/rails/railties/lib/initializer'
+# require File.expand_path("#{@base_path}/lib/my_mysql_setup_listener")
+# # # # DeepTest::Database::MysqlSetupListener.new.starting(Struct.new(:number).new(123))
+# w = MyMysqlSetupListener.new
+# w.starting(Struct.new(:number).new(123))
+# ENV["DEEP_TEST_DB"] = w.worker_database        
+        
+        
+#         Dir.chdir @base_path
+#         resolver = FilenameResolver.new(@base_path)
         files.each do |file|
+#           puts file
           load resolver.resolve(file)
         end
+      rescue Exception => e
+        puts e.message
+        pp e.backtrace
+        raise
       end
 
       def start_all
@@ -52,13 +81,13 @@ module DeepTest
         @warlock.stop_all if @warlock
       end
 
-      def self.start(address, base_path, workers, grace_period = MERCY_KILLING_GRACE_PERIOD)
+      def self.start(address, base_path, workers, options, grace_period = MERCY_KILLING_GRACE_PERIOD)
         innie, outie = IO.pipe
 
         warlock.start("RemoteWorkerServer") do
           innie.close
 
-          server = new(base_path, workers)
+          server = new(base_path, workers, options)
 
           DRb.start_service("drubyall://#{address}:0", server)
           DeepTest.logger.info "RemoteWorkerServer started at #{DRb.uri}"

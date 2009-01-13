@@ -15,7 +15,8 @@ module DeepTest
         DeepTest.logger.debug("mirror spawn_worker_server for #{options.origin_hostname}")
         RemoteWorkerServer.start(URI.parse(@config[:uri]).host,
                                  options.mirror_path(@config[:work_dir]),
-                                 TestServerWorkers.new(options, @config, DRbClientConnectionInfo.new))
+                                 TestServerWorkers.new(options, @config, DRbClientConnectionInfo.new),
+                                 options)
       end
 
       def status
