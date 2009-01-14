@@ -38,13 +38,13 @@ module DeepTest
       # this method and grant them.
       #
       def grant_privileges(connection)
-        identified_by = if worker_database_config[:password]
-                          %{identified by %s} % connection.quote(worker_database_config[:password])
+        identified_by = if worker_database_config["password"]
+                          %{identified by %s} % connection.quote(worker_database_config["password"])
                         else
                           ""
                         end
         sql = %{grant all on #{worker_database}.* to %s@'localhost' #{identified_by} ; } % 
-          connection.quote(worker_database_config[:username])
+          connection.quote(worker_database_config["username"])
 
         connection.execute sql
       end
@@ -91,13 +91,13 @@ module DeepTest
       end
 
       def command_line_config(config) # :nodoc:
-        command =  ['-u', config[:username]]
-        command += ["-p#{config[:password]}"] if config[:password]
-        command += ['-h', config[:host]] if config[:host]
-        command += ['-P', config[:port]] if config[:port]
-        command += ['-S', config[:socket]] if config[:socket]
-        command += [config[:database]]
-        command.join(' ') 
+        command =  ['-u', config["username"]]
+        command += ["-p#{config["password"]}"] if config["password"]
+        command += ['-h', config["host"]] if config["host"]
+        command += ['-P', config["port"]] if config["port"]
+        command += ['-S', config["socket"]] if config["socket"]
+        command += [config["database"]]
+        command.join(' ')
       end
 
       def admin_connection # :nodoc:
