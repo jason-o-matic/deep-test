@@ -11,8 +11,8 @@ module DeepTest
         Option.new(:timeout_in_seconds, Option::Integer, 30),
         Option.new(:ui,                 Option::String, "DeepTest::UI::Console"),
         Option.new(:worker_listener,    Option::String, "DeepTest::NullWorkerListener"),
-        Option.new(:libs,               Option::Array, nil),
-        Option.new(:requires,           Option::Array, nil),
+        Option.new(:libs,               Option::Array, []),
+        Option.new(:requires,           Option::Array, []),
       ]
     end
 

@@ -57,7 +57,7 @@ unit_tests do
     ).returns(:workers)
   
     DeepTest::Distributed::RemoteWorkerServer.expects(:start).with(
-      "localhost", anything, :workers
+      "localhost", anything, :workers, options
     )
 
     server.spawn_worker_server(options)

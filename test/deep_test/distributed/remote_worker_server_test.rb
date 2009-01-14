@@ -2,13 +2,15 @@ require File.dirname(__FILE__) + "/../../test_helper"
 
 unit_tests do
   test "start_all delegates to worker implementation" do
-    server = DeepTest::Distributed::RemoteWorkerServer.new("", implementation = mock)
+    options = DeepTest::Options.new(:libs => [], :requires => [])
+    server = DeepTest::Distributed::RemoteWorkerServer.new("", implementation = mock, options)
     implementation.expects(:start_all)
     server.start_all
   end
 
   test "stop_all delegates to worker implementation" do
-    server = DeepTest::Distributed::RemoteWorkerServer.new("", implementation = mock)
+    options = DeepTest::Options.new(:libs => [], :requires => [])
+    server = DeepTest::Distributed::RemoteWorkerServer.new("", implementation = mock, options)
     implementation.expects(:stop_all)
     server.stop_all
   end
@@ -25,8 +27,9 @@ unit_tests do
       end
       self
     end
+    options = DeepTest::Options.new(:libs => [], :requires => [])
 
-    server = DeepTest::Distributed::RemoteWorkerServer.new("", implementation)
+    server = DeepTest::Distributed::RemoteWorkerServer.new("", implementation, options)
     server.stop_all
     assert_equal false, implementation.done?
 
@@ -36,10 +39,11 @@ unit_tests do
   end
   
   test "load_files loads each file in list, resolving each filename with resolver" do
-    DeepTest::Distributed::FilenameResolver.expects(:new).with("/mirror/dir").
+    options = DeepTest::Options.new(:libs => [], :requires => [])
+    DeepTest::Distributed::FilenameResolver.expects(:new).times(2).with("/mirror/dir").
       returns(resolver = mock)
 
-    server = DeepTest::Distributed::RemoteWorkerServer.new("/mirror/dir", stub_everything)
+    server = DeepTest::Distributed::RemoteWorkerServer.new("/mirror/dir", stub_everything, options)
 
     resolver.expects(:resolve).with("/source/path/my/file.rb").
       returns("/mirror/dir/my/file.rb")
@@ -50,6 +54,7 @@ unit_tests do
   end
 
   test "service is removed after grace period if workers haven't been started" do
+    options = DeepTest::Options.new(:libs => [], :requires => [])
     log_level = DeepTest.logger.level
     begin
       DeepTest.logger.level = Logger::ERROR
@@ -57,6 +62,7 @@ unit_tests do
         "localhost",                                              
         "base_path",
         stub_everything,
+        options,
         0.25
       )
       # Have to sleep long enough to warlock to reap dead process
@@ -72,6 +78,7 @@ unit_tests do
   end
 
   test "service is not removed after grace period if workers have been started" do
+    options = DeepTest::Options.new(:libs => [], :requires => [])
     log_level = DeepTest.logger.level
     begin
       DeepTest.logger.level = Logger::ERROR
@@ -81,6 +88,7 @@ unit_tests do
           Socket.gethostname,
           "", 
           stub_everything,
+          options,
           0.25
         )
       end
