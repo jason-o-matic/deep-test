@@ -93,7 +93,7 @@ module DeepTest
       # +worker_database+ instead of the database named in the master config.
       # 
       def worker_database_config
-        master_database_config.merge(:database => worker_database)
+        master_database_config.merge("database" => worker_database)
       end
 
       #
