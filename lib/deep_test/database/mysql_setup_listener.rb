@@ -101,7 +101,8 @@ module DeepTest
       end
 
       def admin_connection # :nodoc:
-        conn = ActiveRecord::Base.mysql_connection(self.class.admin_configuration)
+        ActiveRecord::Base.establish_connection(self.class.admin_configuration)
+        conn = ActiveRecord::Base.connection
         yield conn
       ensure
         conn.disconnect! if conn
