@@ -4,6 +4,7 @@ module DeepTest
       def initialize(options, slaves)
         DeepTest.logger.debug "MultiTestServerProxy#initialize #{slaves.length} slaves"
         @slave_controller = DispatchController.new(options, slaves)
+        @slaves = slaves
       end
 
       def spawn_worker_server(options)
@@ -14,8 +15,15 @@ module DeepTest
       end
 
       def sync(options)
-        DeepTest.logger.debug "dispatch sync for #{options.origin_hostname}"
-        @slave_controller.dispatch(:sync, options)
+        if options.sync_options[:push_code]
+          @slaves.each do |slave|
+            DeepTest.logger.debug "sync to: #{slave.inspect}"
+            RSync.sync(slave.connection_info, options, options.mirror_path(slave.config[:work_dir]))
+          end
+        else
+          DeepTest.logger.debug "dispatch sync for #{options.origin_hostname}"
+          @slave_controller.dispatch(:sync, options)
+        end
       end
 
       class WorkerServerProxy

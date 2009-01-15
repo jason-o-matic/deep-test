@@ -54,7 +54,7 @@ module DeepTest
     end
 
     def origin_hostname
-      (Socket.gethostname == @origin_hostname) ? 'localhost' : @origin_hostname
+      @origin_hostname
     end
 
     # Don't store UI instances in the options instance, which will

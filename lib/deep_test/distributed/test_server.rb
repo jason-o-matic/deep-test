@@ -33,6 +33,14 @@ module DeepTest
         DeepTest.logger.debug "Syncing #{options.sync_options[:source]} to #{path}"
         RSync.sync(DRbClientConnectionInfo.new, options, path)
       end
+      
+      def connection_info
+        DRbClientConnectionInfo.new
+      end
+      
+      def config
+        @config
+      end
 
       def servers
         [DRbObject.new_with_uri(DRb.uri)]
