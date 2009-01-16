@@ -18,7 +18,7 @@ module DeepTest
         if options.sync_options[:push_code]
           @slaves.each do |slave|
             DeepTest.logger.debug "sync to: #{slave.inspect}"
-            RSync.sync(slave.connection_info, options, options.mirror_path(slave.config[:work_dir]))
+            RSync.sync(Struct.new(:address).new(URI::parse(slave.__drburi).host), options, options.mirror_path(slave.config[:work_dir]))
           end
         else
           DeepTest.logger.debug "dispatch sync for #{options.origin_hostname}"

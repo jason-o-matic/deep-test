@@ -34,10 +34,6 @@ module DeepTest
         RSync.sync(DRbClientConnectionInfo.new, options, path)
       end
       
-      def connection_info
-        DRbClientConnectionInfo.new
-      end
-      
       def config
         @config
       end
