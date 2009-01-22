@@ -15,8 +15,8 @@ module DeepTest
         Server.remote_reference(@connection_info.address, @options.server_port)
       end
 
-      def start_all
-        super
+      def start_all(drbserver)
+        super(drbserver)
         @warlock.exit_when_none_running
       end
     end

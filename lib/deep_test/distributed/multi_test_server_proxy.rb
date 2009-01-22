@@ -1,6 +1,7 @@
 module DeepTest
   module Distributed
     class MultiTestServerProxy
+      
       def initialize(options, slaves)
         DeepTest.logger.debug "MultiTestServerProxy#initialize #{slaves.length} slaves"
         @slave_controller = DispatchController.new(options, slaves)
@@ -27,7 +28,11 @@ module DeepTest
       end
 
       class WorkerServerProxy
+        
+        attr_reader :slaves
+        
         def initialize(options, slaves)
+          @slaves = slaves
           DeepTest.logger.debug "WorkerServerProxy#initialize #{slaves.inspect}"
           @slave_controller = DispatchController.new(options, slaves)
         end
@@ -37,9 +42,9 @@ module DeepTest
           @slave_controller.dispatch(:load_files, files)
         end
 
-        def start_all
+        def start_all(drbserver)
           DeepTest.logger.debug "dispatch start_all"
-          @slave_controller.dispatch(:start_all)
+          @slave_controller.dispatch(:start_all, drbserver)
         end
 
         def stop_all

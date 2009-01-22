@@ -19,7 +19,13 @@ module DeepTest
           Thread.new do
             Thread.current[:receiver] = r
             Timeout.timeout(@options.timeout_in_seconds) do
+              begin
+                puts "ABOUT TO DISPATCH r: #{r.inspect}"
               r.send method_name, *args
+                rescue Exception => ex
+                puts "DISPATCH EXCEPTION: #{ex.message}\n#{ex.backtrace.join("\n")}"
+                raise
+                end
             end
           end
         end
@@ -38,7 +44,7 @@ module DeepTest
             end
           rescue Exception => e
             @receivers.delete t[:receiver]
-            DeepTest.logger.error "Exception while dispatching #{method_name} to #{t[:receiver].__drburi} #{e.message}"
+            DeepTest.logger.error "Exception while dispatching #{method_name} to #{t[:receiver].__drburi} #{e.message}\n#{e.backtrace.join("\n")}"
           end
         end
 

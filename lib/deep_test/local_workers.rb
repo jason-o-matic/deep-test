@@ -1,5 +1,8 @@
 module DeepTest
   class LocalWorkers
+    
+    MUTEX = Mutex.new
+    
     def initialize(options)
       @options = options
       @warlock = Warlock.new
@@ -12,14 +15,39 @@ module DeepTest
     def server
       @options.server
     end
-
-    def start_all
+    
+    def take_work
+      MUTEX.synchronize do
+      r = @drbserver.take_work
+        sleep 0.5
+        r
+        end
+    end
+    
+    def write_result(res)
+      MUTEX.synchronize do
+      r = @drbserver.write_result res
+        sleep 0.5
+        r
+        end
+    end
+    
+    def start_all(drbserver)
+      @drbserver = drbserver
+      
       each_worker do |worker_num|
         start_worker(worker_num) do
           reseed_random_numbers
           reconnect_to_database
+#           serv = drbserver.server
+#           puts "WORKER FOO: #{serv.inspect} #{serv.foo.inspect}"
           worker = DeepTest::Worker.new(worker_num,
-                                        server, 
+#                                         server, 
+#                                         drbserver[worker_num.to_i], 
+#                                         drbserver.server, 
+#                                         drbserver, 
+                                        self,
+#                                         serv, 
                                         @options.new_listener_list)
           worker.run
         end

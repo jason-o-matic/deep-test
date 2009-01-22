@@ -88,3 +88,5 @@ require File.dirname(__FILE__) + "/deep_test/test"
 
 require File.dirname(__FILE__) + "/deep_test/ui/console"
 require File.dirname(__FILE__) + "/deep_test/ui/null"
+
+require File.dirname(__FILE__) + "/deep_test/drbfire"

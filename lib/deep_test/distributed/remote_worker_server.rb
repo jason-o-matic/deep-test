@@ -54,9 +54,16 @@ module DeepTest
         raise
       end
 
-      def start_all
+      def drbserver=(drbserver)
+        puts "REMOTE WORKER SERVER drbserver= #{drbserver.inspect}"
+#         puts "FOO: #{drbserver.map {|s| s.foo}.inspect}"
+        puts "FOO: #{drbserver.foo.inspect}"
+        @drbserver = drbserver
+      end
+      
+      def start_all(drbserver)
         @workers_started = true
-        @workers.start_all
+        @workers.start_all(@drbserver)
       end
 
       def stop_all
@@ -89,7 +96,10 @@ module DeepTest
 
           server = new(base_path, workers, options)
 
-          DRb.start_service("drubyall://#{address}:0", server)
+#           DRb.start_service("drubyall://#{address}:0", server)
+#           DRb.start_service("drbfire://#{address}:34567", server, DRbFire::ROLE => DRbFire::SERVER)
+#           DRb.start_service("drbfire://#{address}:0", server, DRbFire::ROLE => DRbFire::SERVER, DRbFire::DELEGATE => DRbBindAllTCPSocket, "delegate_scheme" => "drubyall")
+          DRb.start_service("drbfire://#{address}:0", server, DRbFire::ROLE => DRbFire::SERVER, DRbFire::DELEGATE => DRbBindAllTCPSocket)
           DeepTest.logger.info "RemoteWorkerServer started at #{DRb.uri}"
 
           outie.write DRb.uri
@@ -103,6 +113,7 @@ module DeepTest
         outie.close
         uri = innie.gets
         innie.close
+  puts "RWS START URI: #{uri.inspect}"
         DRbObject.new_with_uri(uri)
       end
 
