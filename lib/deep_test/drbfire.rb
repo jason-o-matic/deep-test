@@ -154,40 +154,31 @@ module DRbFire
           @queue.pop
         end
       rescue TimeoutError
-        puts "TIMEOUT ERROR\n#{caller.join("\n")}"
         raise DRb::DRbConnError, "Unable to get a client connection."
       end
     end
 
     class << self
       def open_server(uri, config)
-#         puts "OPEN SERVER #{uri.inspect} #{config.inspect}"
         if(server?(config))
           @client_servers ||= {}
-#           new(uri, delegate(config).open_server(uri, config))
 
+          puts "OPEN SERVER1 #{uri}"
           
           sock = delegate(config).open_server(uri, config)
           scheme = sock.uri.match(/^(.*):\/\//)[1]
-#           sock.uri =~ /^(.*):\/\/(.*?):(\d+)(\?(.*))?$/
-#           scheme, host, port, opt = [$1, $2, $3.to_i, $5]
           drbfire_uri = sock.uri.sub(scheme, SCHEME)
-          puts "OPEN SERVER #{drbfire_uri}"
+          puts "OPEN SERVER2 #{drbfire_uri}\n#{caller.join("\n")}"
           new(drbfire_uri, sock)
           
-#           osuri = uri.dup
-#           osuri = osuri.sub(SCHEME, config["delegate_scheme"]) if config["delegate_scheme"]
-#           puts "OPEN SERVER2 #{osuri.inspect}"
-#           new(uri, delegate(config).open_server(osuri, config))
+#           new(uri, delegate(config).open_server(uri, config))
         else
           ClientServer.new(uri, config)
         end
       end
 
       def open(uri, config, type=INCOMING_CONN)
-        puts "OPEN #{uri.inspect} #{config.inspect} #{type.inspect} #{parse_uri(uri).last.to_i}"
         unless(server?(config))
-#           connection = new(uri, delegate(config).open(uri, config))
           connection = new(uri, delegate(config).open(uri, config))
           connection.stream.write(type)
           connection
@@ -224,7 +215,6 @@ module DRbFire
       private
 
       def server?(config)
-#         puts "DRBFIRE CONFIG: #{config.inspect}\n#{caller.join("\n")}"
         raise "Invalid configuration" unless(config.include?(ROLE))
         config[ROLE] == SERVER
       end
