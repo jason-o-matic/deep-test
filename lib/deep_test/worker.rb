@@ -13,11 +13,13 @@ module DeepTest
       while work_unit = next_work_unit
         @listener.starting_work(self, work_unit)
 
+        start_time = Time.now
         result = begin
                    work_unit.run
                  rescue Exception => error
                    Error.new(work_unit, error)
                  end
+        result.time = Time.now - start_time
 
         @listener.finished_work(self, work_unit, result)
         @blackboard.write_result result
