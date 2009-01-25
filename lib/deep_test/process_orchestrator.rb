@@ -14,7 +14,7 @@ module DeepTest
       passed = false
 
       begin
-        server = Server.new(@options)
+        server = Server.start(@options)
         @options.new_listener_list.before_starting_workers
         @workers.start_all(server)
         begin

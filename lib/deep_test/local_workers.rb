@@ -14,7 +14,7 @@ module DeepTest
       @options.server
     end
 
-    def start_all(server_proxy)
+    def start_all(s)
       each_worker do |worker_num|
         start_worker(worker_num) do
           reseed_random_numbers

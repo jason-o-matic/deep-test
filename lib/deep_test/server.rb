@@ -2,13 +2,25 @@ module DeepTest
   class Server
     include DRbUndumped
     
+    def self.start(options)
+      server = new(options)
+      
+      # start_sevice if running locally, otherise we only want to use the RemoteWorkerClient connection
+      if options.distributed_server.nil?
+        DRb.start_service("drbfire://0.0.0.0:#{options.server_port}", server, DRbFire::ROLE => DRbFire::SERVER)
+        DeepTest.logger.info "Started DeepTest service at #{DRb.uri}"
+      end
+      
+      server
+    end
+
     def self.stop
       DRb.stop_service
     end
 
     def self.remote_reference(address, port)
-      DRb.start_service
-      blackboard = DRbObject.new_with_uri("druby://#{address}:#{port}")
+      DRb.start_service("drbfire://#{address}:#{port}", nil, DRbFire::ROLE => DRbFire::CLIENT)
+      blackboard = DRbObject.new_with_uri("drbfire://#{address}:#{port}")
       DeepTest.logger.debug "Connecting to DeepTest server at #{blackboard.__drburi}"
       blackboard
     end
