@@ -36,7 +36,7 @@ module DeepTest
         
         missing_tests = 
           ResultReader.new(@blackboard).read(tests_by_name) do |test, remote_result|
-            result_times["#{test.method_name}(#{test.class.name})"] = remote_result.time
+            result_times["#{test.method_name}(#{test.class.name}) #{remote_result.host}"] = remote_result.time
             remote_result.add_to result
             yield ::Test::Unit::TestCase::FINISHED, test.name if block_given?
           end

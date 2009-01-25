@@ -20,6 +20,7 @@ module DeepTest
                    Error.new(work_unit, error)
                  end
         result.time = Time.now - start_time
+        result.host = Socket.gethostname
 
         @listener.finished_work(self, work_unit, result)
         @blackboard.write_result result
