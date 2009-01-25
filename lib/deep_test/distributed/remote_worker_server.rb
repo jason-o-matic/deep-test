@@ -63,7 +63,8 @@ module DeepTest
       
       def start_all(drbserver)
         @workers_started = true
-        @workers.start_all(@drbserver)
+#         @workers.start_all(@drbserver)
+        @workers.start_all(self)
       end
 
       def stop_all
@@ -75,7 +76,18 @@ module DeepTest
       def workers_started?
         @workers_started
       end
+      
+      attr_accessor :uri
 
+    def take_work
+      puts "RWS TAKE WORK"
+      r = @drbserver.take_work
+    end
+    
+    def write_result(res)
+      r = @drbserver.write_result res
+    end
+    
       def self.warlock
         @warlock ||= DeepTest::Warlock.new
       end
@@ -96,12 +108,16 @@ module DeepTest
 
           server = new(base_path, workers, options)
 
+      DRb.start_service("druby://127.0.0.1:34523", server)
+          
 #           DRb.start_service("drubyall://#{address}:0", server)
 #           DRb.start_service("drbfire://#{address}:34567", server, DRbFire::ROLE => DRbFire::SERVER)
 #           DRb.start_service("drbfire://#{address}:0", server, DRbFire::ROLE => DRbFire::SERVER, DRbFire::DELEGATE => DRbBindAllTCPSocket, "delegate_scheme" => "drubyall")
           DRb.start_service("drbfire://#{address}:0", server, DRbFire::ROLE => DRbFire::SERVER, DRbFire::DELEGATE => DRbBindAllTCPSocket)
           DeepTest.logger.info "RemoteWorkerServer started at #{DRb.uri}"
 
+          server.uri = DRb.uri
+          
           outie.write DRb.uri
           outie.close
 

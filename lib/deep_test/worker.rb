@@ -34,6 +34,7 @@ module DeepTest
     end
 
     def next_work_unit
+      puts "WORKER next_work_unit bb: #{@blackboard.inspect}"
       @blackboard.take_work
     rescue Server::NoWorkUnitsAvailableError
       sleep 0.02
