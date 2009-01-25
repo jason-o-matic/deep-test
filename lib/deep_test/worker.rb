@@ -29,12 +29,12 @@ module DeepTest
     rescue Server::NoWorkUnitsRemainingError
       DeepTest.logger.debug("Worker #{number}: no more work to do")
     rescue Exception => e
-      puts "WORKER EXCEPTION: #{e.message}\n#{e.backtrace.join("\n")}"
+      DeepTest.logger.debug "Worker #{number} EXCEPTION: #{e.message}\n#{e.backtrace.join("\n")}"
       raise
     end
 
     def next_work_unit
-      puts "WORKER next_work_unit bb: #{@blackboard.inspect}"
+      DeepTest.logger.debug "Worker #{number} getting next work unit from: #{@blackboard.inspect}"
       @blackboard.take_work
     rescue Server::NoWorkUnitsAvailableError
       sleep 0.02

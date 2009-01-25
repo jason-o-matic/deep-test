@@ -14,12 +14,12 @@ module DeepTest
       passed = false
 
       begin
-        server = Server.start(@options)
+        server = Server.new(@options)
         @options.new_listener_list.before_starting_workers
         @workers.start_all(server)
         begin
           DeepTest.logger.debug "Loader Starting (#{$$})"
-          passed = @runner.process_work_units
+          passed = @runner.process_work_units(server)
         ensure
           shutdown(server)
         end

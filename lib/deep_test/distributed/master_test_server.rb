@@ -39,7 +39,6 @@ module DeepTest
         servers = server_uris.map {|server_uri| DRbObject.new_with_uri server_uri}
         master = DeepTest::Distributed::MasterTestServer.new(servers)
         DRb.start_service(uri, master)
-#         DRb.start_service(uri, master, DRbFire::ROLE => DRbFire::SERVER)
         master
       end
 

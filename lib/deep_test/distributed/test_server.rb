@@ -44,8 +44,7 @@ module DeepTest
 
       def self.start(config)
         server = DeepTest::Distributed::TestServer.new(config)
-#         DRb.start_service(config[:uri], server)
-        DRb.start_service(config[:uri], server, DRbFire::ROLE => DRbFire::SERVER)
+        DRb.start_service(config[:uri], server)
         DeepTest.logger.info "TestServer listening at #{DRb.uri}"
         DRb.thread.join
       end

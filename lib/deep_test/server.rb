@@ -2,35 +2,12 @@ module DeepTest
   class Server
     include DRbUndumped
     
-    @@server = nil
-    
-    def self.server
-      @@server
-    end
-    
-    def server
-      @@server
-    end
-    
-    def foo
-      "foo"
-    end
-    
-    def self.start(options)
-      @@server = server = new(options)
-#       DRb.start_service("druby://0.0.0.0:#{options.server_port}", server)
-#       DRb.start_service("drbfire://0.0.0.0:#{options.server_port}", server, DRbFire::ROLE => DRbFire::SERVER)
-#       DeepTest.logger.info "Started DeepTest service at #{DRb.uri}"
-      server
-    end
-
     def self.stop
       DRb.stop_service
     end
 
     def self.remote_reference(address, port)
       DRb.start_service
-#       DRb.start_service("drbfire://0.0.0.0:6971", nil, DRbFire::ROLE => DRbFire::CLIENT)
       blackboard = DRbObject.new_with_uri("druby://#{address}:#{port}")
       DeepTest.logger.debug "Connecting to DeepTest server at #{blackboard.__drburi}"
       blackboard

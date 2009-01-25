@@ -20,12 +20,12 @@ module DeepTest
             Thread.current[:receiver] = r
             Timeout.timeout(@options.timeout_in_seconds) do
               begin
-                puts "ABOUT TO DISPATCH r: #{r.inspect}"
-              r.send method_name, *args
-                rescue Exception => ex
-                puts "DISPATCH EXCEPTION: #{ex.message}\n#{ex.backtrace.join("\n")}"
+                DeepTest.logger.debug "Dispatching to #{r.inspect}: #{method_name}(*#{args.inspect})"
+                r.send method_name, *args
+              rescue Exception => ex
+                DeepTest.logger.debug "DISPATCH EXCEPTION from #{r.inspect}: #{ex.message}\n#{ex.backtrace.join("\n")}"
                 raise
-                end
+              end
             end
           end
         end

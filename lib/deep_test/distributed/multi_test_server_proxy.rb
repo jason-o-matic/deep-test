@@ -42,9 +42,9 @@ module DeepTest
           @slave_controller.dispatch(:load_files, files)
         end
 
-        def start_all(drbserver)
+        def start_all
           DeepTest.logger.debug "dispatch start_all"
-          @slave_controller.dispatch(:start_all, drbserver)
+          @slave_controller.dispatch(:start_all)
         end
 
         def stop_all

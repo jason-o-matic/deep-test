@@ -17,7 +17,6 @@ module DeepTest
         puts " Distributed DeepTest Failure ".center(width, '*')
         puts "*   Failed during #{method}".ljust(width - 1) + "*"
         puts "* #{exception.message}".ljust(width - 1) + "*"
-        puts exception.backtrace.join("\n")
         puts "* Failing over to local run".ljust(width - 1) + "*"
         puts "*" * width
       end

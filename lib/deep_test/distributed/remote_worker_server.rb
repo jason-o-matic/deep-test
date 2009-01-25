@@ -5,6 +5,8 @@ module DeepTest
       include DRb::DRbUndumped
 
       MERCY_KILLING_GRACE_PERIOD = 10 * 60 unless defined?(MERCY_KILLING_GRACE_PERIOD)
+      
+      attr_accessor :uri
 
       def initialize(base_path, workers, options)
         @base_path = base_path
@@ -54,16 +56,8 @@ module DeepTest
         raise
       end
 
-      def drbserver=(drbserver)
-        puts "REMOTE WORKER SERVER drbserver= #{drbserver.inspect}"
-#         puts "FOO: #{drbserver.map {|s| s.foo}.inspect}"
-        puts "FOO: #{drbserver.foo.inspect}"
-        @drbserver = drbserver
-      end
-      
-      def start_all(drbserver)
+      def start_all
         @workers_started = true
-#         @workers.start_all(@drbserver)
         @workers.start_all(self)
       end
 
@@ -76,18 +70,7 @@ module DeepTest
       def workers_started?
         @workers_started
       end
-      
-      attr_accessor :uri
 
-    def take_work
-      puts "RWS TAKE WORK"
-      r = @drbserver.take_work
-    end
-    
-    def write_result(res)
-      r = @drbserver.write_result res
-    end
-    
       def self.warlock
         @warlock ||= DeepTest::Warlock.new
       end
@@ -107,12 +90,8 @@ module DeepTest
           innie.close
 
           server = new(base_path, workers, options)
-
-      DRb.start_service("druby://127.0.0.1:34523", server)
           
-#           DRb.start_service("drubyall://#{address}:0", server)
-#           DRb.start_service("drbfire://#{address}:34567", server, DRbFire::ROLE => DRbFire::SERVER)
-#           DRb.start_service("drbfire://#{address}:0", server, DRbFire::ROLE => DRbFire::SERVER, DRbFire::DELEGATE => DRbBindAllTCPSocket, "delegate_scheme" => "drubyall")
+          # this is half the magic that lets us work through the NAT
           DRb.start_service("drbfire://#{address}:0", server, DRbFire::ROLE => DRbFire::SERVER, DRbFire::DELEGATE => DRbBindAllTCPSocket)
           DeepTest.logger.info "RemoteWorkerServer started at #{DRb.uri}"
 
@@ -129,8 +108,22 @@ module DeepTest
         outie.close
         uri = innie.gets
         innie.close
-  puts "RWS START URI: #{uri.inspect}"
         DRbObject.new_with_uri(uri)
+      end
+      
+      ######################################################################################
+      # These methods allow us to proxy the Server through the NAT
+      ######################################################################################
+      def drbserver=(drbserver)
+        DeepTest.logger.debug "Setting the Server remote reference to: #{drbserver.inspect}"
+        @drbserver = drbserver
+      end
+      def take_work
+        DeepTest.logger.debug "Remote worker server proxying 'take_work' back to Server"
+        @drbserver.take_work
+      end
+      def write_result(res)
+        @drbserver.write_result res
       end
 
     end

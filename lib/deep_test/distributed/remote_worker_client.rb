@@ -1,9 +1,6 @@
 module DeepTest
   module Distributed
     class RemoteWorkerClient
-      
-      attr_reader :worker_server
-      
       def initialize(options, test_server, failover_workers)
         @failover_workers = failover_workers
         @options = options
@@ -17,11 +14,11 @@ module DeepTest
           @test_server.sync(@options)
           @worker_server = @test_server.spawn_worker_server(@options)
           
-        @worker_server.slaves.each do |s|
-          puts "REMOTE WORKER CLIENT CONNECT: #{s.inspect}"
-          DRb.start_service(s.__drburi, nil, DRbFire::ROLE => DRbFire::CLIENT) # , DRbFire::DELEGATE => DRbBindAllTCPSocket, "delegate_scheme" => "drubyall"
-        end
-        puts "ABOUT TO LOAD FILES #{__FILE__}:#{__LINE__} #{@worker_server.inspect}"
+          @worker_server.slaves.each do |s|
+            DeepTest.logger.debug "Startng the DRb service to connect to: #{s.inspect}"
+            DRb.start_service(s.__drburi, nil, DRbFire::ROLE => DRbFire::CLIENT)
+          end
+          
           @worker_server.load_files filelist
         end
 
@@ -41,13 +38,11 @@ module DeepTest
       def start_all(drbserver)
         
         @worker_server.slaves.each do |s|
-          puts "REMOTE WORKER CLIENT START ALL CONNECT: #{drbserver}\n#{s.inspect}"
-#           DRb.start_service(s.__drburi, nil, DRbFire::ROLE => DRbFire::CLIENT)
-#           s.drbserver = [Server.server, Server.server]
-          s.drbserver = Server.server
+          DeepTest.logger.debug "Remote worker client start_all sending Server reference to RemoteWorkerServer: #{s.inspect}"
+          s.drbserver = drbserver
         end
         
-        @worker_server.start_all(drbserver)
+        @worker_server.start_all
       rescue => e
         raise if failed_over?
         fail_over("start_all", e)

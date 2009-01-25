@@ -1,8 +1,6 @@
 module DeepTest
   class LocalWorkers
     
-    MUTEX = Mutex.new
-    
     def initialize(options)
       @options = options
       @warlock = Warlock.new
@@ -11,53 +9,18 @@ module DeepTest
     def load_files(files)
       files.each {|f| load f}
     end
-
+    
     def server
       @options.server
     end
-    
-    def take_work
-      MUTEX.synchronize do
-      r = @drbserver.take_work
-#         sleep 0.5
-        r
-        end
-    end
-    
-    def write_result(res)
-      MUTEX.synchronize do
-      r = @drbserver.write_result res
-#         sleep 0.5
-        r
-        end
-    end
-    
-    def start_all(drbserver)
-      @drbserver = drbserver
-      
-#       DRb.start_service("druby://127.0.0.1:34523", self)
-      
+
+    def start_all(server_proxy)
       each_worker do |worker_num|
         start_worker(worker_num) do
           reseed_random_numbers
           reconnect_to_database
-#           serv = drbserver.server
-#           puts "WORKER FOO: #{serv.inspect} #{serv.foo.inspect}"
-          DRb.stop_service
-          DRb.start_service(drbserver.uri, nil, DRbFire::ROLE => DRbFire::CLIENT) # , DRbFire::DELEGATE => DRbBindAllTCPSocket, "delegate_scheme" => "drubyall"
-#           DRb.start_service
-          puts "LW DRB SERVER URI: #{drbserver.uri.inspect} #{drbserver.inspect}"
-          bb = DRbObject.new_with_uri(drbserver.uri)
-#           bb = DRbObject.new_with_uri("druby://127.0.0.1:34523")
-#           puts "WORKER FOO: #{bb.inspect} #{bb.foo.inspect}"
           worker = DeepTest::Worker.new(worker_num,
-#                                         server, 
-#                                         drbserver[worker_num.to_i], 
-#                                         drbserver.server, 
-#                                         drbserver, 
-#                                         self,
-                                        bb,
-#                                         serv, 
+                                        server, 
                                         @options.new_listener_list)
           worker.run
         end
