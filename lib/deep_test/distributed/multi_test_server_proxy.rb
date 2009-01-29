@@ -17,14 +17,37 @@ module DeepTest
 
       def sync(options)
         if options.sync_options[:push_code]
-          @slaves.each do |slave|
-            DeepTest.logger.debug "sync to: #{slave.inspect}"
-            RSync.sync(Struct.new(:address).new(URI::parse(slave.__drburi).host), options, options.mirror_path(slave.config[:work_dir]))
-          end
+          multi_push_sync(options)
         else
           DeepTest.logger.debug "dispatch sync for #{options.origin_hostname}"
           @slave_controller.dispatch(:sync, options)
         end
+      end
+      
+      def multi_push_sync(options)
+        puts "Syncing..."
+        sync_start = Time.now
+        
+        threads = @slaves.map do |slave|
+          Thread.new do
+            Thread.current[:receiver] = slave
+            Timeout.timeout(options.timeout_in_seconds) do
+              RSync.sync(Struct.new(:address).new(URI::parse(slave.__drburi).host), options, options.mirror_path(slave.config[:work_dir]))
+            end
+          end
+        end
+
+        results = []
+        threads.each do |t|
+          begin
+            results << t.value
+          rescue Timeout::Error
+            DeepTest.logger.error "Timeout syncing to #{t[:receiver].__drburi}"
+            raise
+          end
+        end
+        
+        puts "Sync took #{Time.now - sync_start} seconds"
       end
 
       class WorkerServerProxy

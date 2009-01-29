@@ -4,8 +4,9 @@ module DeepTest
       def self.sync(connection_info, options, destination)
         command = Args.new(connection_info, options).command(destination)
         DeepTest.logger.debug("rsycing: #{command}")
-        successful = system command
-        raise "RSync Failed!!" unless successful
+        output = `#{command}`
+        raise "RSync Failed!!\nCommand failed: #{command}\nWith output:\nBEGIN#{'=' * 80}\n#{output}\nEND#{'=' * 82}" unless $?.success?
+        output
       end
 
       class Args
@@ -20,7 +21,7 @@ module DeepTest
           # The '/' after source tells rsync to copy the contents
           # of source to destination, rather than the source directory
           # itself
-          "rsync -az --delete #{@sync_options[:rsync_options]} #{source_location}/ #{destination_location(destination)}".strip.squeeze(" ")
+          "rsync -az --delete #{@sync_options[:rsync_options]} #{source_location}/ #{destination_location(destination)} 2>&1".strip.squeeze(" ")
         end
 
         def source_location
