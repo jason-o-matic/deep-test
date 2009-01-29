@@ -90,3 +90,4 @@ require File.dirname(__FILE__) + "/deep_test/ui/console"
 require File.dirname(__FILE__) + "/deep_test/ui/null"
 
 require File.expand_path(File.dirname(__FILE__) + "/deep_test/drbfire.rb")
+require File.expand_path(File.dirname(__FILE__) + "/deep_test/test/collector/rails_ordered_object_space.rb")

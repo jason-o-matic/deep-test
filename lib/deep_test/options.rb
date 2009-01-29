@@ -13,6 +13,7 @@ module DeepTest
         Option.new(:worker_listener,    Option::String, "DeepTest::NullWorkerListener"),
         Option.new(:libs,               Option::Array, []),
         Option.new(:requires,           Option::Array, []),
+        Option.new(:test_collector,     Option::Symbol, :objectspace),
       ]
     end
 

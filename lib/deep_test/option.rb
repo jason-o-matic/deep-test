@@ -66,5 +66,15 @@ module DeepTest
         a.split(File::PATH_SEPARATOR)
       end
     end
+    
+    module Symbol
+      def self.to_string(s)
+        s.to_s
+      end
+
+      def self.from_string(s)
+        s.to_sym
+      end
+    end
   end
 end
