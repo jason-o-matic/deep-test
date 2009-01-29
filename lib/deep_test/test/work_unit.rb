@@ -29,9 +29,16 @@ module DeepTest
 
       def run_without_deadlock_protection
         result = WorkResult.new(@test_case.name)
+        
+        result.host = Socket.gethostname
+        start_time = Time.now
+        
         output = capture_stdout do
           @test_case.run(result) {|channel,event|}
         end
+        
+        result.time = Time.now - start_time
+        
         result.output = output
         result
       end

@@ -26,28 +26,12 @@ module DeepTest
       end
 
       def load_files(files)
-# # puts "LOAD FILES: #{files.inspect}"
         @options.new_listener_list.before_remote_load_files
-# # $: << "#{@base_path}/lib"
-# # puts "RWS LOAD FILES workers: #{@workers.instance_variable_get("@options").new_listener_list.before_remote_load_files.inspect}"
+        
         Dir.chdir @base_path
         resolver = FilenameResolver.new(@base_path)
-# # # # require File.expand_path("#{@base_path}/config/environment")
-# $: << "#{@base_path}/vendor/rails/activerecord/lib"
-# # # # require File.expand_path("#{@base_path}/vendor/rails/activerecord/lib/active_record")
-# require "active_record"
-# # # # require 'vendor/rails/railties/lib/initializer'
-# require File.expand_path("#{@base_path}/lib/my_mysql_setup_listener")
-# # # # DeepTest::Database::MysqlSetupListener.new.starting(Struct.new(:number).new(123))
-# w = MyMysqlSetupListener.new
-# w.starting(Struct.new(:number).new(123))
-# ENV["DEEP_TEST_DB"] = w.worker_database        
         
-        
-#         Dir.chdir @base_path
-#         resolver = FilenameResolver.new(@base_path)
         files.each do |file|
-#           puts file
           load resolver.resolve(file)
         end
       rescue Exception => e

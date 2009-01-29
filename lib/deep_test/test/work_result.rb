@@ -20,10 +20,17 @@ module DeepTest
         assertion_count.times {result.add_assertion}
         run_count.times {result.add_run}
       end
+      
+      # repackage failure to include host
+      def add_failure(failure)
+        super(failure.class.new(failure.test_name + " [#{@host}]", failure.location, failure.message))
+      end
 
+      # repackage error to include host
       def add_error(error)
-        error.make_exception_marshallable
-        super(error)
+        e = error.class.new(error.test_name + " [#{@host}]", error.exception)
+        e.make_exception_marshallable
+        super(e)
       end
       
       def failed_due_to_deadlock?
