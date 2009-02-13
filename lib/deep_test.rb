@@ -39,6 +39,7 @@ require "thread"
 require "socket"
 require "webrick"
 require "timeout"
+require "drb/drbfire"
 
 require File.dirname(__FILE__) + "/deep_test/extensions/object_extension"
 require File.dirname(__FILE__) + "/deep_test/extensions/drb_extension"
@@ -89,5 +90,4 @@ require File.dirname(__FILE__) + "/deep_test/test"
 require File.dirname(__FILE__) + "/deep_test/ui/console"
 require File.dirname(__FILE__) + "/deep_test/ui/null"
 
-require File.expand_path(File.dirname(__FILE__) + "/deep_test/drbfire.rb")
 require File.expand_path(File.dirname(__FILE__) + "/deep_test/test/collector/rails_ordered_object_space.rb")
