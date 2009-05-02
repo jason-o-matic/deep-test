@@ -39,6 +39,8 @@ require "thread"
 require "socket"
 require "webrick"
 require "timeout"
+
+gem 'jason-o-matic-drbfire'
 require "drb/drbfire"
 
 require File.dirname(__FILE__) + "/deep_test/extensions/object_extension"
