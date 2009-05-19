@@ -28,6 +28,13 @@ module DeepTest
         puts "Syncing..."
         sync_start = Time.now
         
+        if options.sync_options[:code_distribution_server]
+          dist_dest = options.mirror_path("/tmp")
+          RSync.sync(Struct.new(:address).new(options.sync_options[:code_distribution_server]), options, dist_dest)
+          options.sync_options[:distribution_server_tunnel] = true
+          options.sync_options[:distribution_server_source] = dist_dest
+        end
+        
         threads = @slaves.map do |slave|
           Thread.new do
             Thread.current[:receiver] = slave

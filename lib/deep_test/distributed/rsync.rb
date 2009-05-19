@@ -21,13 +21,18 @@ module DeepTest
           # The '/' after source tells rsync to copy the contents
           # of source to destination, rather than the source directory
           # itself
-          "rsync -az --delete #{@sync_options[:rsync_options]} #{source_location}/ #{destination_location(destination)} 2>&1".strip.squeeze(" ")
+          cmd = "rsync -az --delete #{@sync_options[:rsync_options]} #{source_location}/ #{destination_location(destination)} 2>&1".strip.squeeze(" ")
+          @sync_options[:distribution_server_tunnel] ? tunnelize(cmd) : cmd
+        end
+        
+        def tunnelize(rsync_command)
+          "ssh #{@sync_options[:ssh_tunnel_options]} #{@sync_options[:username]}@#{@sync_options[:code_distribution_server]} 'cd #{source_location} && #{rsync_command}'"
         end
 
         def source_location
           loc = ""
           loc << common_location_options unless @sync_options[:local] || @sync_options[:push_code]
-          loc << @sync_options[:source]
+          loc << (@sync_options[:distribution_server_source] || @sync_options[:source])
         end
 
         def destination_location(destination)
